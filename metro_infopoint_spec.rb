@@ -1,11 +1,43 @@
 require 'rspec'
+require 'yaml'
 require './metro_infopoint'
+path_to_file = "./config/timing#{ENV['VARIANT']}.yml"
+timing_data = YAML.load_file(path_to_file)['timing']
+
 
 FROM_TO_PAIRS = [
-  { from_station:'shevchenkivska', to_station: 'kiborgiv',   calculated_time: 3 + 6 + 2, calculated_price: 2.5 + 3 + 1 },
-  { from_station:'lemberska',      to_station: 'nezalezhna', calculated_time: 6 + 2 + 6 + 3, calculated_price: 3 + 1 + 3 + 2.5 },
-  { from_station:'konotopska',     to_station: 'banderivska', calculated_time: 3 + 3, calculated_price: 2.5 + 2.5 }
+  { from_station:'shevchenkivska',
+    to_station: 'kiborgiv',
+    calculated_time:
+		  timing_data.find { |e| e['start'].to_s == 'shevchenkivska' && e['end'].to_s == 'banderivska' }['time'] +
+		    timing_data.find { |e| e['start'].to_s == 'banderivska' && e['end'].to_s == 'sheptyckogo' }['time'] +
+		      timing_data.find { |e| e['start'].to_s == 'sheptyckogo' && e['end'].to_s == 'kiborgiv' }['time'],
+    calculated_price:
+      timing_data.find { |e| e['start'].to_s == 'shevchenkivska' && e['end'].to_s == 'banderivska' }['price'] +
+        timing_data.find { |e| e['start'].to_s == 'banderivska' && e['end'].to_s == 'sheptyckogo' }['price'] +
+          timing_data.find { |e| e['start'].to_s == 'sheptyckogo' && e['end'].to_s == 'kiborgiv' }['price'] },
+  { from_station:'lemberska',
+    to_station: 'nezalezhna',
+    calculated_time:
+      timing_data.find { |e| e['start'].to_s == 'halytska' && e['end'].to_s == 'lemberska' }['time'] +
+        timing_data.find { |e| e['start'].to_s == 'sheptyckogo' && e['end'].to_s == 'halytska' }['time'] +
+          timing_data.find { |e| e['start'].to_s == 'banderivska' && e['end'].to_s == 'sheptyckogo' }['time'] +
+            timing_data.find { |e| e['start'].to_s == 'nezalezhna' && e['end'].to_s == 'banderivska' }['time'],
+    calculated_price:
+      timing_data.find { |e| e['start'].to_s == 'halytska' && e['end'].to_s == 'lemberska' }['price'] +
+        timing_data.find { |e| e['start'].to_s == 'sheptyckogo' && e['end'].to_s == 'halytska' }['price'] +
+          timing_data.find { |e| e['start'].to_s == 'banderivska' && e['end'].to_s == 'sheptyckogo' }['price'] +
+            timing_data.find { |e| e['start'].to_s == 'nezalezhna' && e['end'].to_s == 'banderivska' }['price'] },
+  { from_station:'konotopska',
+    to_station: 'banderivska',
+    calculated_time:
+      timing_data.find { |e| e['start'].to_s == 'konotopska' && e['end'].to_s == 'shevchenkivska' }['time'] +
+        timing_data.find { |e| e['start'].to_s == 'shevchenkivska' && e['end'].to_s == 'banderivska' }['time'],
+    calculated_price:
+      timing_data.find { |e| e['start'].to_s == 'konotopska' && e['end'].to_s == 'shevchenkivska' }['time'] +
+        timing_data.find { |e| e['start'].to_s == 'shevchenkivska' && e['end'].to_s == 'banderivska' }['time'] }
 ]
+
 
 class MetroInfopointDouble
   def initialize(path_to_timing_file:, path_to_lines_file:)

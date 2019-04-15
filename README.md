@@ -172,14 +172,21 @@ timing:
 
 ### Check your solution:
 
-In order to verify your solution working as expected, please run next command:
+In order to verify your solution working as expected, please run next command with your variant:
+```
+gem install rspec
 
-    gem install rspec
-    rspec metro_infopoint_spec.rb
+VARIANT=1 rspec metro_infopoint_spec.rb
+...........
+
+Finished in 0.00625 seconds (files took 0.14822 seconds to load)
+11 examples, 0 failures
+```
 
 This command will test your code with automatic test suite.
 
 ### Tips:
+You will earn extra points if your calculation will be optimal by time or price.
 
 Please send us your code even if you haven't fully implemented all the requirements. We understand that the task may turn out to be more complex than it looks at first glance.
 
