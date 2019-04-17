@@ -34,8 +34,8 @@ FROM_TO_PAIRS = [
       timing_data.find { |e| e['start'].to_s == 'konotopska' && e['end'].to_s == 'shevchenkivska' }['time'] +
         timing_data.find { |e| e['start'].to_s == 'shevchenkivska' && e['end'].to_s == 'banderivska' }['time'],
     calculated_price:
-      timing_data.find { |e| e['start'].to_s == 'konotopska' && e['end'].to_s == 'shevchenkivska' }['time'] +
-        timing_data.find { |e| e['start'].to_s == 'shevchenkivska' && e['end'].to_s == 'banderivska' }['time'] }
+      timing_data.find { |e| e['start'].to_s == 'konotopska' && e['end'].to_s == 'shevchenkivska' }['price'] +
+        timing_data.find { |e| e['start'].to_s == 'shevchenkivska' && e['end'].to_s == 'banderivska' }['price'] }
 ]
 
 
@@ -61,7 +61,7 @@ end
 
 
 RSpec.describe MetroInfopoint do
-  let(:object) { MetroInfopoint.new(path_to_timing_file: '', path_to_lines_file: '') }
+  let(:object) { MetroInfopoint.new(path_to_timing_file: path_to_file, path_to_lines_file: "./config/config.yml") }
 
   describe 'valid class' do
     it { expect(MetroInfopoint).to respond_to(:new) }
@@ -70,19 +70,19 @@ RSpec.describe MetroInfopoint do
 
   describe '#calculate_price' do
     FROM_TO_PAIRS.each do |e|
-      it { expect(object.calculate_price(from_station: e[:from_station], to_station: e[:to_station])).to eq(e[:calculated_price]) }
+      it { expect(object.calculate_price(from_station: e[:from_station], to_station: e[:to_station])).to be_within(e[:calculated_price]).of(0.00001) }
     end
   end
 
   describe '#calculate_time' do
     FROM_TO_PAIRS.each do |e|
-      it { expect(object.calculate_time(from_station: e[:from_station], to_station: e[:to_station])).to eq(e[:calculated_time]) }
+      it { expect(object.calculate_time(from_station: e[:from_station], to_station: e[:to_station])).to be_within(e[:calculated_time]).of(0.00001) }
     end
   end
 
   describe '#calculate' do
     FROM_TO_PAIRS.each do |e|
-      result = { price: e[:calculated_price], time: e[:calculated_time] }
+      result = { price: e[:calculated_price].round(5), time: e[:calculated_time].round(5) }
       it { expect(object.calculate(from_station: e[:from_station], to_station: e[:to_station])).to eq(result) }
     end
   end
